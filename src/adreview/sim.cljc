@@ -1,0 +1,97 @@
+(ns adreview.sim
+  "Demo driver -- `clojure -M:dev:run`. Walks a clean campaign through
+  intake -> regime assessment -> 广告审查 submission (escalate/approve/
+  commit) -> publication (escalate/approve/commit), then shows every
+  HARD-hold scenario the China regime adds."
+  (:require [langgraph.graph :as g]
+            [adreview.store :as store]
+            [adreview.operation :as op]))
+
+(def operator {:actor-id "op-1" :actor-role :advertising-operator :phase 3})
+
+(defn- exec-op [actor tid request context]
+  (g/run* actor {:request request :context context} {:thread-id tid}))
+
+(defn- approve! [actor tid]
+  (g/run* actor {:approval {:status :approved :by "op-1"}} {:thread-id tid :resume? true}))
+
+(defn- assess! [actor tid-prefix subject]
+  (exec-op actor (str tid-prefix "-assess") {:op :regime/assess :subject subject} operator)
+  (approve! actor (str tid-prefix "-assess")))
+
+(defn- review! [actor tid-prefix subject]
+  (exec-op actor (str tid-prefix "-review") {:op :review/submit :subject subject} operator)
+  (approve! actor (str tid-prefix "-review")))
+
+(defn- ready! [actor tid-prefix subject]
+  (assess! actor tid-prefix subject)
+  (review! actor tid-prefix subject))
+
+(defn -main [& _]
+  (let [db (store/seed-db)
+        actor (op/build db)]
+    (println "== campaign/intake cmp-1 (CHN, clean) ==")
+    (println (exec-op actor "t1" {:op :campaign/intake :subject "cmp-1"
+                                  :patch {:id "cmp-1" :advertiser "华东健康食品有限公司"}} operator))
+
+    (println "== regime/assess cmp-1 (escalates -- human approves) ==")
+    (println (exec-op actor "t2" {:op :regime/assess :subject "cmp-1"} operator))
+    (println (approve! actor "t2"))
+
+    (println "== review/submit cmp-1 (always escalates -- actuation/submit-review) ==")
+    (let [r (exec-op actor "t3" {:op :review/submit :subject "cmp-1"} operator)]
+      (println r)
+      (println "-- human advertising operator approves --")
+      (println (approve! actor "t3")))
+
+    (println "== campaign/publish cmp-1 (always escalates -- actuation/publish-campaign) ==")
+    (let [r (exec-op actor "t4" {:op :campaign/publish :subject "cmp-1"} operator)]
+      (println r)
+      (println "-- human advertising operator approves --")
+      (println (approve! actor "t4")))
+
+    (println "== regime/assess cmp-2 (no spec-basis -> HARD hold) ==")
+    (println (exec-op actor "t5" {:op :regime/assess :subject "cmp-2" :no-spec? true} operator))
+
+    (println "== campaign/publish cmp-3 (广告批准文号 missing -> HARD hold, FLAGSHIP) ==")
+    (ready! actor "t6" "cmp-3")
+    (println (exec-op actor "t6-pub" {:op :campaign/publish :subject "cmp-3"} operator))
+
+    (println "== campaign/publish cmp-4 (广告批准文号 expired -> HARD hold) ==")
+    (ready! actor "t7" "cmp-4")
+    (println (exec-op actor "t7-pub" {:op :campaign/publish :subject "cmp-4"} operator))
+
+    (println "== campaign/publish cmp-5 (弹窗 without 一键关闭 -> HARD hold) ==")
+    (ready! actor "t8" "cmp-5")
+    (println (exec-op actor "t8-pub" {:op :campaign/publish :subject "cmp-5"} operator))
+
+    (println "== campaign/publish cmp-6 (互联网广告 not marked 广告 -> HARD hold) ==")
+    (ready! actor "t9" "cmp-6")
+    (println (exec-op actor "t9-pub" {:op :campaign/publish :subject "cmp-6"} operator))
+
+    (println "== campaign/publish cmp-7 (代言人 never used the product -> HARD hold) ==")
+    (ready! actor "t10" "cmp-7")
+    (println (exec-op actor "t10-pub" {:op :campaign/publish :subject "cmp-7"} operator))
+
+    (println "== campaign/publish cmp-8 (media spend over authorized budget -> HARD hold) ==")
+    (ready! actor "t11" "cmp-8")
+    (println (exec-op actor "t11-pub" {:op :campaign/publish :subject "cmp-8"} operator))
+
+    (println "== campaign/publish cmp-9 (budget unrecorded -> HARD hold, un-checkable) ==")
+    (ready! actor "t12" "cmp-9")
+    (println (exec-op actor "t12-pub" {:op :campaign/publish :subject "cmp-9"} operator))
+
+    (println "== review/submit cmp-1 AGAIN (double-review -> HARD hold) ==")
+    (println (exec-op actor "t13" {:op :review/submit :subject "cmp-1"} operator))
+
+    (println "== campaign/publish cmp-1 AGAIN (double-publish -> HARD hold) ==")
+    (println (exec-op actor "t14" {:op :campaign/publish :subject "cmp-1"} operator))
+
+    (println "== audit ledger ==")
+    (doseq [f (store/ledger db)] (println f))
+
+    (println "== 广告审查 submission records ==")
+    (doseq [r (store/review-history db)] (println r))
+
+    (println "== publication records ==")
+    (doseq [r (store/publication-history db)] (println r))))

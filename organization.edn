@@ -1,0 +1,18 @@
+;; Real-world regulator this blueprint's compliance surface points at.
+;; :head-role is institutional title only — no personal names.
+;; This repo is NOT this organization and never acts as it (see README).
+{:ooyake-id "gov.chn.samr"
+ :official-url "https://www.samr.gov.cn/"
+ :name-en "State Administration for Market Regulation"
+ :name-local "国家市场监督管理总局"
+ ;; :wikidata deliberately absent — no Wikidata item was fetched and read
+ ;; for this entry, and this repo does not record identifiers it did not
+ ;; verify. Add it when someone actually checks the item.
+ :head-role "国家市场监督管理总局局长"
+ :head-role-note "institutional office title only; personal names of current office-holders are intentionally NOT stored"
+ :contact-page "https://www.samr.gov.cn/"
+ :sourced-from "samr.gov.cn — fetched 2026-07-27 while reading 广告法 / 互联网广告管理办法 / 广告审查管理暂行办法"
+ :role "广告审查・互联网广告监管の主管部门 (广告法第四十六条 / 互联网广告管理办法 / 暂行办法第四条)"
+ :review-authority-note "実際の广告审查は省・自治区・直辖市の市场监督管理部门および药品监督管理部门が行う (暂行办法第四条)"
+ :hq {:line-en "Beijing" :country "chn" :kind "national-regulator"
+      :provenance "https://www.samr.gov.cn/" :last-verified "2026-07-27" :sourcing "authoritative"}}

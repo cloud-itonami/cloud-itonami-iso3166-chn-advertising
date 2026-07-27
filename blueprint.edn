@@ -1,0 +1,34 @@
+{:itonami.blueprint/id "cloud-itonami-iso3166-chn-advertising"
+ :itonami.blueprint/name "China Advertising Pre-Publication Review & Internet-Advertising Conformance Service"
+ :itonami.blueprint/iso3166 "CHN"
+ :itonami.blueprint/isic-rev5 "7310"
+ :itonami.blueprint/domain :professional/advertising-review-compliance
+ :itonami.blueprint/license "AGPL-3.0-or-later"
+ :itonami.blueprint/social-impact [:consumer-protection :advertising-transparency :cross-border-friction-reduction]
+ :itonami.blueprint/governor :ad-review-compliance-governor
+ :itonami.blueprint/robotics false
+ :itonami.blueprint/required-technologies [:identity :forms :dmn :bpmn :audit-ledger]
+ :itonami.blueprint/non-goals [:autonomous-publication :legal-advice :impersonating-a-review-authority]
+ :itonami.blueprint/status :public-oss
+ :itonami.blueprint/maturity :implemented
+ :itonami.blueprint/implemented-slice
+ "adreview.governor (an independent Ad-Review Compliance Governor) in
+ front of a contained adreview.adreviewllm advisor, wired as a
+ langgraph StateGraph (adreview.operation) with an
+ interrupt-before approval node. The flagship HARD check is
+ ad-review-approval-missing: a campaign whose own product category is
+ inside the jurisdiction's CLOSED reviewed set (广告法第四十六条's
+ 医疗/药品/医疗器械/农药/兽药/保健食品 plus 互联网广告管理办法第七条's
+ 特殊医学用途配方食品) may not be proposed for publication unless a
+ 广告批准文号 is independently verified as recorded AND unexpired at the
+ campaign's own publish date (暂行办法第九条/第十八条). An unrecorded or
+ non-ISO-8601 date pair yields ad-review-validity-unknown -- un-checkable
+ is NOT 'still valid'. Four further China-specific HARD checks:
+ internet-ad-unlabelled and popup-no-one-click-close
+ (互联网广告管理办法第九条/第十条), endorser-did-not-use-product and
+ endorser-under-minimum-age (广告法第三十八条). Plus the fleet's
+ MAXIMUM-ceiling family check on media spend vs client-authorized
+ budget, with its own explicit un-checkable hold, and double-actuation
+ guards on review submission and publication. :review/submit and
+ :campaign/publish are absent from every phase's :auto set, asserted at
+ load time in adreview.phase."}
