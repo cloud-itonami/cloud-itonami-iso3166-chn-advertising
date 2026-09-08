@@ -31,7 +31,7 @@
   an advertising operator would keep, not the act of publishing the
   advertisement itself (that is `adreview.operation`'s
   `:campaign/publish`, always human-gated -- see README Actuation)."
-  (:require [clojure.string :as str]))
+  (:require [kotoba.lang.text :as str]))
 
 (defn- unsigned-certificate
   "Every certificate this actor produces is UNSIGNED -- signature is
@@ -115,7 +115,7 @@
     (throw (ex-info "review-submission: jurisdiction required" {})))
   (when (< sequence 0)
     (throw (ex-info "review-submission: sequence must be >= 0" {})))
-  (let [review-number (str (str/upper-case jurisdiction) "-RVW-" (zero-pad sequence 6))
+  (let [review-number (str (str/upper jurisdiction) "-RVW-" (zero-pad sequence 6))
         record {"record_id" review-number
                 "kind" "ad-review-submission-draft"
                 "campaign_id" campaign-id
@@ -141,7 +141,7 @@
      (throw (ex-info "publication: jurisdiction required" {})))
    (when (< sequence 0)
      (throw (ex-info "publication: sequence must be >= 0" {})))
-   (let [publication-number (str (str/upper-case jurisdiction) "-PUB-" (zero-pad sequence 6))
+   (let [publication-number (str (str/upper jurisdiction) "-PUB-" (zero-pad sequence 6))
          record (cond-> {"record_id" publication-number
                          "kind" "campaign-publication"
                          "campaign_id" campaign-id
