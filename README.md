@@ -22,9 +22,9 @@ advertising actor. Same family, different regulatory domain — see
 | Actor | `src/adreview/*` |
 | Governor | `:ad-review-compliance-governor` |
 | Flagship HARD | `ad-review-approval-missing` |
-| Tests | `clojure -M:dev:test` — 45 tests, 189 assertions |
-| Demo | `clojure -M:dev:run` |
-| Lint | `clojure -M:lint` |
+| Tests | `kbb -M:dev:test` — 45 tests, 189 assertions |
+| Demo | `kbb -M:dev:run` |
+| Lint | `kbb -M:lint` |
 
 ## What the governor actually checks
 
