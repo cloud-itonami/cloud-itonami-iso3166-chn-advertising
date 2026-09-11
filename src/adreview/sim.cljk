@@ -1,5 +1,5 @@
 (ns adreview.sim
-  "Demo driver -- `clojure -M:dev:run`. Walks a clean campaign through
+  "Demo driver -- `kbb -M:dev:run`. Walks a clean campaign through
   intake -> regime assessment -> 广告审查 submission (escalate/approve/
   commit) -> publication (escalate/approve/commit), then shows every
   HARD-hold scenario the China regime adds."

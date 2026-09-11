@@ -68,7 +68,7 @@ rewrite):
   `iso-date?` rather than silently mis-ordered.
 - The load-time assertion in `adreview.phase` means the actuation
   invariant cannot be weakened by a quiet one-word diff.
-- 45 tests / 189 assertions green; `clojure -M:lint` clean.
+- 45 tests / 189 assertions green; `kbb -M:lint` clean.
 
 ## Alternatives considered
 

@@ -3,9 +3,9 @@
 ## Run it
 
 ```bash
-clojure -M:dev:test    # 45 tests, 189 assertions
-clojure -M:dev:run     # the demo: one clean campaign + every HARD-hold scenario
-clojure -M:lint        # clj-kondo, errors fail CI
+kbb -M:dev:test    # 45 tests, 189 assertions
+kbb -M:dev:run     # the demo: one clean campaign + every HARD-hold scenario
+kbb -M:lint        # clj-kondo, errors fail CI
 ```
 
 Inside the monorepo the `:local/root` deps resolve as-is. A standalone fork
