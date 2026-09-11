@@ -9,7 +9,7 @@
                         EAV store.
 
   Both implement the same protocol and pass the same contract
-  (test/adreview/store_contract_test.clj).
+  (test/adreview/store_contract_test.cljk).
 
   The primary entity is a `campaign` (广告发布案件). The 广告审查
   submission and the publication apply SEQUENTIALLY to the SAME
